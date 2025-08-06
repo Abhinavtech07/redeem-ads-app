@@ -11,12 +11,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-<<<<<<< HEAD
-    "test": "your-test-command"
-=======
     "test": "react-scripts test",
     "eject": "react-scripts eject"
->>>>>>> 3f2968b (Recreate missing files and fix App.js)
   },
   "browserslist": {
     "production": [
