@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-I am unable to create the CSS file with the content of an empty CSS file. I can create an empty file, however. Should I proceed?
-=======
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -9,13 +6,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-
 #root {
   /* Add basic styles for the root element if needed */
 }
->>>>>>> 3f2968b (Recreate missing files and fix App.js)

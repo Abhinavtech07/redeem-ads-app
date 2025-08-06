@@ -136,10 +136,11 @@ function App() {
         alert("✅ 1 Coin Added!");
       }
     }, 1000);
->>>>>>> 3f2968b (Recreate missing files and fix App.js)
   };
 
   const handleRedeem = () => {
+    // Check if the user has enough coins to redeem
+    if (coins >= 50) {
       alert("🎉 You can redeem ₹10 now! This will be processed manually.");
       // Placeholder for integrating Google Play Store code distribution
       // You would add your logic here to generate or retrieve a code
@@ -163,7 +164,6 @@ function App() {
   // You might want to add a handleReset function here as well if needed for Firebase data
   // const handleReset = async () => { ... }
 
->>>>>>> 3f2968b (Recreate missing files and fix App.js)
   return (
     <div className="App">
       <h1>🎁 Redeem Coins App</h1>
@@ -184,7 +184,6 @@ function App() {
           <button onClick={handleRedeem}>💸 Redeem Coins</button>
           {/* Add a Reset button here if you implement handleReset */}
           {/* <button onClick={handleReset}>🧹 Reset My Data</button> */}
->>>>>>> 3f2968b (Recreate missing files and fix App.js)
         </div>
       ) : (
         <button onClick={handleLogin}>🔐 Sign in with Google</button>
