@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-// src/App.js
-=======
-/* App.js */
->>>>>>> 3f2968b (Recreate missing files and fix App.js)
+/* src/App.js */
 import React, { useEffect, useState } from "react";
 import { auth, db } from "./firebase";
 import {
@@ -26,20 +22,6 @@ function App() {
   const [user, setUser] = useState(null);
   const [coins, setCoins] = useState(0);
   const [adsWatchedToday, setAdsWatchedToday] = useState(0);
-<<<<<<< HEAD
-  const DAILY_LIMIT = 200;
-  const adLinks = [
-    "https://www.profitableratecpm.com/i63pbecy1?key=6ca31a0952a0956430a016a37ca0fd57",
-    "https://www.profitableratecpm.com/hte0hzu0v?key=fb45638729e3933cb3d3e10867a09592",
-    "https://www.profitableratecpm.com/eszwggg0?key=784e73c7dc4b992d827cc02a85d064b7"
-  ];
-  const [currentAdIndex, setCurrentAdIndex] = useState(0);
-  const AD_DURATION = 15000; // 15 seconds in milliseconds
-  const COINS_PER_AD = 1;
-
-  useEffect(() => {
-    onAuthStateChanged(auth, async (currentUser) => {
-=======
   const [adTimerMessage, setAdTimerMessage] = useState(''); // Added for timer message
   const DAILY_LIMIT = 200;
   const COINS_PER_AD = 1;
@@ -53,7 +35,6 @@ function App() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
->>>>>>> 3f2968b (Recreate missing files and fix App.js)
       setUser(currentUser);
       if (currentUser) {
         const userRef = doc(db, "users", currentUser.uid);
@@ -73,10 +54,6 @@ function App() {
             lastWatched: today
           });
         }
-<<<<<<< HEAD
-      }
-    });
-=======
       } else {
         // Clear state if user logs out
         setCoins(0);
@@ -86,7 +63,6 @@ function App() {
     });
 
     return () => unsubscribe(); // Cleanup subscription
->>>>>>> 3f2968b (Recreate missing files and fix App.js)
   }, []);
 
   const handleLogin = () => {
@@ -114,47 +90,6 @@ function App() {
     }
 
     if (data.adsWatchedToday >= DAILY_LIMIT) {
-<<<<<<< HEAD
-      return alert("You reached your daily limit of ads.");
-    }
-
-    // Get the current ad URL
-    const adURL = adLinks[currentAdIndex];
-
-    // Disable the watch ad button
-    // document.getElementById('watch-ad-button').disabled = true; // Removed as button is managed by React state
-
-    // Show Adsterra ad popup
-    const adWindow = window.open("https://www.google.com", "_blank", "width=500,height=500"); // Replace with actual ad URL
-
-    // Update UI to show timer
-    const statusElement = document.getElementById('status');
-    const originalStatusText = statusElement.innerText;
-    let timer = AD_DURATION / 1000;
-
-    const countdown = setInterval(() => {
-      statusElement.innerText = `Ad playing... ${timer} seconds remaining`;
-      timer--;
-    }, 1000);
-
-    setTimeout(async () => {
-      clearInterval(countdown);
-      if (adWindow) adWindow.close();
-
-      const updatedCoins = (data.coins || 0) + COINS_PER_AD;
-      const updatedAds = (data.adsWatchedToday || 0) + 1;
-
-      await updateDoc(userRef, { coins: updatedCoins, adsWatchedToday: updatedAds, lastWatched: today, updatedAt: serverTimestamp() });
-      setCoins(updatedCoins);
-      setAdsWatchedToday(updatedAds);
-      // statusElement.innerText = originalStatusText; // Restore original text - Removed as status is managed by React state
-      // document.getElementById('watch-ad-button').disabled = false; // Re-enable button - Removed as button is managed by React state
-
-      // Move to the next ad URL for the next watch
-      setCurrentAdIndex((prevIndex) => (prevIndex + 1) % adLinks.length);
-      alert("✅ 1 Coin Added!");
-    }, AD_DURATION);
-=======
       setAdTimerMessage(''); // Clear any previous timer message
       return alert("You reached your daily limit of ads.");
     }
@@ -205,15 +140,6 @@ function App() {
   };
 
   const handleRedeem = () => {
-    if (coins >= 50) {
-<<<<<<< HEAD
-      alert("You will get ₹10 in redeem.\nThis will be processed manually.");
-    } else {
-      alert("You need at least 50 coins to redeem.");
-    }
-  };
-
-=======
       alert("🎉 You can redeem ₹10 now! This will be processed manually.");
       // Placeholder for integrating Google Play Store code distribution
       // You would add your logic here to generate or retrieve a code
@@ -246,14 +172,6 @@ function App() {
           <p>Welcome, {user.displayName}</p>
           <button onClick={handleLogout}>Logout</button>
           <h2>Coins: {coins}</h2>
-<<<<<<< HEAD
-          <h3>Watched Today: {adsWatchedToday} / {DAILY_LIMIT}</h3>
-          <button onClick={handleWatchAd} disabled={adsWatchedToday >= DAILY_LIMIT}>
-            ▶️ Watch Ad & Earn Coin {adsWatchedToday >= DAILY_LIMIT && "(Limit Reached)"}
-          </button>
-          <br /><br />
-          <button onClick={handleRedeem}>💸 Redeem Coins</button>
-=======
           {adTimerMessage ? ( // Display timer message if present
             <h3>{adTimerMessage}</h3>
           ) : (
@@ -275,9 +193,4 @@ function App() {
   );
 }
 
-<<<<<<< HEAD
 export default App;
-
-=======
-export default App;
->>>>>>> 3f2968b (Recreate missing files and fix App.js)
