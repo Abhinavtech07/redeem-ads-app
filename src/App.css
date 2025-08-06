@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* App.css */
 .App {
     text-align: center;
@@ -21,3 +22,26 @@
     background: #388E3C;
   }
   
+=======
+.App {
+  text-align: center;
+  padding: 20px;
+  background-color: #f0f0f0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+h1 {
+  color: #333;
+}
+
+button {
+  margin: 10px;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+}
+>>>>>>> 3f2968b (Recreate missing files and fix App.js)
