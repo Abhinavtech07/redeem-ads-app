@@ -1,0 +1,23 @@
+/* App.css */
+.App {
+    text-align: center;
+    font-family: 'Segoe UI', sans-serif;
+    margin-top: 30px;
+  }
+  
+  button {
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    transition: 0.2s;
+  }
+  
+  button:hover {
+    background: #388E3C;
+  }
+  

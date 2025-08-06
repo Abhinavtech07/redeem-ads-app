@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🎁 Watch Ads & Earn Coins</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom right, #0f0c29, #302b63, #24243e);
+      color: white;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 100px auto;
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #ff4ecd;
+      text-shadow: 0 0 10px #ff4ecd;
+    }
+
+    h2, h3 {
+      color: #fff;
+      margin: 10px 0;
+    }
+
+    button {
+      padding: 15px 30px;
+      margin: 12px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(145deg, #ff4ecd, #7e30e1);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 0 15px #7e30e1;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px #ff4ecd;
+    }
+
+    .footer {
+      margin-top: 40px;
+      font-size: 0.9rem;
+      color: #ccc;
+      animation: fadeIn 1s ease-in-out 1s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .glow {
+      text-shadow: 0 0 5px #ff4ecd, 0 0 10px #ff4ecd, 0 0 20px #ff4ecd;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <div class="container">
+    <h1 class="glow">🎁 Earn Coins by Watching Ads</h1>
+    <h2 id="coins">Coins: 0</h2>
+    <h3 id="status">Watched Today: 0 / 200</h3>
+
+    <button onclick="watchAd()">▶️ Watch Ad & Earn</button>
+    <button onclick="redeem()">💸 Redeem Coins</button>
+    <button onclick="reset()">🧹 Reset My Data</button>
+
+    <div class="footer">
+      🔐 Coins stored in your browser. No login needed.<br/>
+      💰 50 Coins = ₹10 redeem (manual process).<br/>
+      🕓 Limit: 200 ads per day.
+    </div>
+  </div>
+
+  <script>
+    const DAILY_LIMIT = 200;
+    const COINS_PER_AD = 1;
+
+    const adLinks = [
+      "https://www.profitableratecpm.com/i63pbecy1?key=6ca31a0952a0956430a016a37ca0fd57",
+      "https://www.profitableratecpm.com/hte0hzu0v?key=fb45638729e3933cb3d3e10867a09592",
+      "https://www.profitableratecpm.com/eszwggg0?key=784e73c7dc4b992d827cc02a85d064b7"
+    ];
+
+    function getTodayKey() {
+      return new Date().toDateString();
+    }
+
+    function loadData() {
+      const data = JSON.parse(localStorage.getItem("userData") || "{}");
+      const today = getTodayKey();
+      if (data.lastDay !== today) {
+        data.watched = 0;
+        data.lastDay = today;
+      }
+      data.coins = data.coins || 0;
+      data.watched = data.watched || 0;
+      localStorage.setItem("userData", JSON.stringify(data));
+      return data;
+    }
+
+    function saveData(data) {
+      localStorage.setItem("userData", JSON.stringify(data));
+    }
+
+    function updateUI() {
+      const data = loadData();
+      document.getElementById("coins").innerText = "Coins: " + data.coins;
+      document.getElementById("status").innerText =
+        `Watched Today: ${data.watched} / ${DAILY_LIMIT}`;
+    }
+
+    function watchAd() {
+      const data = loadData();
+      if (data.watched >= DAILY_LIMIT) {
+        alert("🚫 You've reached today's ad limit!");
+        return;
+      }
+
+      const randomAd = adLinks[Math.floor(Math.random() * adLinks.length)];
+      const ad = window.open(randomAd, "_blank", "width=500,height=500");
+
+      setTimeout(() => {
+ if (ad) {
+ ad.close();
+ }
+        data.coins += COINS_PER_AD;
+        data.watched += 1;
+        saveData(data);
+        updateUI();
+        alert("✅ 1 Coin Added!");
+      }, 7000);
+    }
+
+    function redeem() {
+      const data = loadData();
+      if (data.coins >= 50) {
+        alert("🎉 You can redeem ₹10 now! This will be processed manually.");
+        data.coins -= 50;
+        saveData(data);
+        updateUI();
+      } else {
+        alert("❌ You need at least 50 coins to redeem.");
+      }
+    }
+
+    function reset() {
+      if (confirm("⚠️ Are you sure you want to reset your data?")) {
+        localStorage.removeItem("userData");
+        updateUI();
+      }
+    }
+
+    updateUI();
+  </script>
+
+  <div style="margin: 40px auto; text-align: center;">
+  <script type="text/javascript">
+	atOptions = {
+		'key' : '76e32163d9651b7a0037761b91840c76',
+		'format' : 'iframe',
+		'height' : 60,
+		'width' : 468,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/76e32163d9651b7a0037761b91840c76/invoke.js"></script>
+  </div>
+
+</body>
+</html>
