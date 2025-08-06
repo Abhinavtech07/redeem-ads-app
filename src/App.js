@@ -23,6 +23,13 @@ function App() {
   const [coins, setCoins] = useState(0);
   const [adsWatchedToday, setAdsWatchedToday] = useState(0);
   const DAILY_LIMIT = 200;
+  const adLinks = [
+    "https://www.profitableratecpm.com/i63pbecy1?key=6ca31a0952a0956430a016a37ca0fd57",
+    "https://www.profitableratecpm.com/hte0hzu0v?key=fb45638729e3933cb3d3e10867a09592",
+    "https://www.profitableratecpm.com/eszwggg0?key=784e73c7dc4b992d827cc02a85d064b7"
+  ];
+  const [currentAdIndex, setCurrentAdIndex] = useState(0);
+  const AD_DURATION = 15000; // 15 seconds in milliseconds
   const COINS_PER_AD = 1;
 
   useEffect(() => {
@@ -78,22 +85,42 @@ function App() {
       return alert("You reached your daily limit of ads.");
     }
 
+    // Get the current ad URL
+    const adURL = adLinks[currentAdIndex];
+
+    // Disable the watch ad button
+    // document.getElementById('watch-ad-button').disabled = true; // Removed as button is managed by React state
+
     // Show Adsterra ad popup
-    window.open("https://www.google.com", "_blank", "width=500,height=500"); // Replace with actual ad
+    const adWindow = window.open("https://www.google.com", "_blank", "width=500,height=500"); // Replace with actual ad URL
 
-    // Simulate ad completion
-    const updatedCoins = (data.coins || 0) + COINS_PER_AD;
-    const updatedAds = (data.adsWatchedToday || 0) + 1;
+    // Update UI to show timer
+    const statusElement = document.getElementById('status');
+    const originalStatusText = statusElement.innerText;
+    let timer = AD_DURATION / 1000;
 
-    await updateDoc(userRef, {
-      coins: updatedCoins,
-      adsWatchedToday: updatedAds,
-      lastWatched: today,
-      updatedAt: serverTimestamp()
-    });
+    const countdown = setInterval(() => {
+      statusElement.innerText = `Ad playing... ${timer} seconds remaining`;
+      timer--;
+    }, 1000);
 
-    setCoins(updatedCoins);
-    setAdsWatchedToday(updatedAds);
+    setTimeout(async () => {
+      clearInterval(countdown);
+      if (adWindow) adWindow.close();
+
+      const updatedCoins = (data.coins || 0) + COINS_PER_AD;
+      const updatedAds = (data.adsWatchedToday || 0) + 1;
+
+      await updateDoc(userRef, { coins: updatedCoins, adsWatchedToday: updatedAds, lastWatched: today, updatedAt: serverTimestamp() });
+      setCoins(updatedCoins);
+      setAdsWatchedToday(updatedAds);
+      // statusElement.innerText = originalStatusText; // Restore original text - Removed as status is managed by React state
+      // document.getElementById('watch-ad-button').disabled = false; // Re-enable button - Removed as button is managed by React state
+
+      // Move to the next ad URL for the next watch
+      setCurrentAdIndex((prevIndex) => (prevIndex + 1) % adLinks.length);
+      alert("✅ 1 Coin Added!");
+    }, AD_DURATION);
   };
 
   const handleRedeem = () => {
@@ -114,7 +141,7 @@ function App() {
           <h2>Coins: {coins}</h2>
           <h3>Watched Today: {adsWatchedToday} / {DAILY_LIMIT}</h3>
           <button onClick={handleWatchAd} disabled={adsWatchedToday >= DAILY_LIMIT}>
-            ▶️ Watch Ad & Earn Coin
+            ▶️ Watch Ad & Earn Coin {adsWatchedToday >= DAILY_LIMIT && "(Limit Reached)"}
           </button>
           <br /><br />
           <button onClick={handleRedeem}>💸 Redeem Coins</button>
