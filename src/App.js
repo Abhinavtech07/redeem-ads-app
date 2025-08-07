@@ -63,7 +63,7 @@ function App() {
     });
 
     return () => unsubscribe(); // Cleanup subscription
-  }, []);
+  }, [auth, db, setCoins, setAdsWatchedToday, setAdTimerMessage]);
 
   const handleLogin = () => {
     signInWithPopup(auth, provider).catch((error) =>
@@ -99,6 +99,7 @@ function App() {
     if (watchAdButton) watchAdButton.disabled = true;
 
     let timer = 15;
+    
     setAdTimerMessage(`Ad playing... ${timer} seconds remaining`);
 
     // Randomly select an ad link
