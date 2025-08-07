@@ -1,9 +1,6 @@
-/* src/App.js */
 import React, { useEffect, useState } from "react";
 import { auth, db } from "./firebase";
 import {
-  signInWithPopup,
-  GoogleAuthProvider,
   signOut,
   onAuthStateChanged
 } from "firebase/auth";
@@ -16,19 +13,16 @@ import {
 } from "firebase/firestore";
 import "./App.css";
 
-const provider = new GoogleAuthProvider();
-
 function App() {
   const [user, setUser] = useState(null);
   const [coins, setCoins] = useState(0);
   const [adsWatchedToday, setAdsWatchedToday] = useState(0);
-  const [adTimerMessage, setAdTimerMessage] = useState(''); // Added for timer message
-  const [showAd, setShowAd] = useState(false); // State to control ad iframe visibility
-  const [currentAdUrl, setCurrentAdUrl] = useState(''); // State to store current ad URL
+  const [adTimerMessage, setAdTimerMessage] = useState('');
+  const [showAd, setShowAd] = useState(false);
+  const [currentAdUrl, setCurrentAdUrl] = useState('');
   const DAILY_LIMIT = 200;
   const COINS_PER_AD = 1;
 
-  // Ad URLs for random selection
   const adLinks = [
     "https://www.profitableratecpm.com/hte0hzu0v?key=fb45638729e3933cb3d3e10867a09592",
     "https://www.profitableratecpm.com/i63pbecy1?key=6ca31a0952a0956430a016a37ca0fd57",
@@ -57,21 +51,14 @@ function App() {
           });
         }
       } else {
-        // Clear state if user logs out
         setCoins(0);
         setAdsWatchedToday(0);
         setAdTimerMessage('');
       }
     });
 
-    return () => unsubscribe(); // Cleanup subscription
-  }, [auth, db, setCoins, setAdsWatchedToday, setAdTimerMessage]);
-
-  const handleLogin = () => {
-    signInWithPopup(auth, provider).catch((error) =>
-      alert("Login failed: " + error.message)
-    );
-  };
+    return () => unsubscribe();
+  }, []);
 
   const handleLogout = () => {
     signOut(auth);
@@ -92,29 +79,22 @@ function App() {
     }
 
     if (data.adsWatchedToday >= DAILY_LIMIT) {
-      setAdTimerMessage(''); // Clear any previous timer message
-      setShowAd(false); // Ensure ad iframe is hidden
+      setAdTimerMessage('');
+      setShowAd(false);
       return alert("You reached your daily limit of ads.");
     }
 
-    // Disable the button and show timer message
-    const watchAdButton = document.querySelector('button[onClick="handleWatchAd"]');
-    if (watchAdButton) watchAdButton.disabled = true;
-
     let timer = 15;
-    
     setAdTimerMessage(`Ad playing... ${timer} seconds remaining`);
 
-    // Randomly select an ad link
     const randomAdUrl = adLinks[Math.floor(Math.random() * adLinks.length)];
     setCurrentAdUrl(randomAdUrl);
-    setShowAd(true); // Show the ad iframe
+    setShowAd(true);
 
-    const countdown = setInterval(async () => { // Changed to async to use await for updateDoc
+    const countdown = setInterval(async () => {
       timer--;
 
       if (timer < 0) {
-        // Update Firebase and state
         const updatedCoins = (data.coins || 0) + COINS_PER_AD;
         const updatedAds = (data.adsWatchedToday || 0) + 1;
 
@@ -128,77 +108,67 @@ function App() {
         setCoins(updatedCoins);
         setAdsWatchedToday(updatedAds);
 
-        clearInterval(countdown); // Stop the timer
-
-        // Re-enable button and clear timer message
-        if (watchAdButton) watchAdButton.disabled = false;
+        clearInterval(countdown);
         setAdTimerMessage('');
         alert("✅ 1 Coin Added!");
-
-        setShowAd(false); // Hide the ad iframe
-        setCurrentAdUrl(''); // Clear the ad URL
+        setShowAd(false);
+        setCurrentAdUrl('');
+      } else {
+        setAdTimerMessage(`Ad playing... ${timer} seconds remaining`);
       }
     }, 1000);
   };
 
   const handleRedeem = () => {
-    // Check if the user has enough coins to redeem
     if (coins >= 50) {
       alert("🎉 You can redeem ₹10 now! This will be processed manually.");
-      // Placeholder for integrating Google Play Store code distribution
-      // You would add your logic here to generate or retrieve a code
-      // and present it to the user, then deduct coins.
-      // Example:
-      // const googlePlayCode = getGooglePlayCode(); // Your function to get a code
-      // if (googlePlayCode) {
-      //   alert(\"🎉 Congratulations! Here is your Google Play Store code: \" + googlePlayCode);
-      //   // Deduct coins after successful redemption
-      //   const userRef = doc(db, \"users\", user.uid);
-      //   updateDoc(userRef, { coins: coins - 50 });
-      //   setCoins(coins - 50);
-      // } else {
-      //   alert(\"❌ Error: Could not retrieve a Google Play Store code.\");
-      // }
     } else {
       alert("❌ You need at least 50 coins to redeem.");
     }
   };
 
-  // You might want to add a handleReset function here as well if needed for Firebase data
-  // const handleReset = async () => { ... }
-
   return (
     <div className="App">
-      <h1>🎁 Redeem Coins App</h1>
+      <header className="App-header">
+        <h1>🎁 Redeem Coins App</h1>
+      </header>
+
       {user ? (
-        <div>
+        <>
           <p>Welcome, {user.displayName}</p>
-          <button onClick={handleLogout}>Logout</button>
-          <h2>Coins: {coins}</h2>
-          {adTimerMessage ? ( // Display timer message if present
-            <h3>{adTimerMessage}</h3>
-          ) : (
-            <h3>Watched Today: {adsWatchedToday} / {DAILY_LIMIT}</h3>
-          )}
-          <button onClick={handleWatchAd} disabled={adsWatchedToday >= DAILY_LIMIT || !!adTimerMessage}> {/* Disable button while timer is running */}
-            ▶️ Watch Ad & Earn Coin
-          </button>
-          <br /><br />
-          <button onClick={handleRedeem}>💸 Redeem Coins</button>
+          <button onClick={handleLogout}>🚪 Logout</button>
+          <div className="main-content">
+            <h2>Coins: {coins}</h2>
+            {adTimerMessage ? (
+              <h3>{adTimerMessage}</h3>
+            ) : (
+              <h3>Watched Today: {adsWatchedToday} / {DAILY_LIMIT}</h3>
+            )}
+            <button onClick={handleWatchAd} disabled={adsWatchedToday >= DAILY_LIMIT || !!adTimerMessage}>
+              ▶️ Watch Ad & Earn Coin
+            </button>
+            <br /><br />
+            <button onClick={handleRedeem}>💸 Redeem Coins</button>
 
-          {/* Ad iframe container */}
-          {showAd && (
-            <div className="ad-container">
-              <iframe src={currentAdUrl} title="Ad" width="320" height="240" frameBorder="0"></iframe>
-              <p>{adTimerMessage}</p> {/* Display timer message within the container */}
-            </div>
-          )}
-
-          {/* Add a Reset button here if you implement handleReset */}
-          {/* <button onClick={handleReset}>🧹 Reset My Data</button> */}
-        </div>
+            {showAd && (
+              <div className="ad-container">
+                <iframe
+                  src={currentAdUrl}
+                  title="Ad"
+                  width="320"
+                  height="240"
+                  frameBorder="0"
+                  allow="autoplay"
+                ></iframe>
+              </div>
+            )}
+          </div>
+        </>
       ) : (
-        <button onClick={handleLogin}>🔐 Sign in with Google</button>
+        <>
+          <p>Please log in to access the app.</p>
+          {/* Login button removed */}
+        </>
       )}
     </div>
   );
