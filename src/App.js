@@ -30,41 +30,6 @@ function App() {
   ];
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        const userRef = doc(db, "users", currentUser.uid);
-        const userSnap = await getDoc(userRef);
-        const today = new Date().toDateString();
-
-        if (userSnap.exists()) {
-          const data = userSnap.data();
-          setCoins(data.coins || 0);
-          setAdsWatchedToday(
-            data.lastWatched === today ? data.adsWatchedToday || 0 : 0
-          );
-        } else {
-          await setDoc(userRef, {
-            coins: 0,
-            adsWatchedToday: 0,
-            lastWatched: today
-          });
-        }
-      } else {
-        setCoins(0);
-        setAdsWatchedToday(0);
-        setAdTimerMessage('');
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  const handleLogout = () => {
-    signOut(auth);
-    setUser(null);
-  };
-
   const handleWatchAd = async () => {
     if (!user) return alert("Please log in to watch ads.");
 
@@ -119,6 +84,28 @@ function App() {
     }, 1000);
   };
 
+  // This useEffect seems to be nested inside the previous one. This is likely an error.
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        const userRef = doc(db, "users", currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          setCoins(data.coins || 0);
+          setAdsWatchedToday(data.adsWatchedToday || 0);
+        } else {
+          await setDoc(userRef, { coins: 0, adsWatchedToday: 0, createdAt: serverTimestamp() });
+        }
+      } else {
+        setCoins(0);
+        setAdsWatchedToday(0);
+      }
+    });
+
+  // This function seems to be defined within the onAuthStateChanged effect. This is likely an error.
+  }, []); // Added dependency array
   const handleRedeem = () => {
     if (coins >= 50) {
       alert("🎉 You can redeem ₹10 now! This will be processed manually.");
@@ -127,51 +114,62 @@ function App() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  // This function seems to be defined within the handleRedeem function. This is likely an error.
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>🎁 Redeem Coins App</h1>
+ <div className="App">
+ <header className="App-header">
+ <h1></h1>
       </header>
-
-      {user ? (
-        <>
-          <p>Welcome, {user.displayName}</p>
-          <button onClick={handleLogout}>🚪 Logout</button>
-          <div className="main-content">
-            <h2>Coins: {coins}</h2>
-            {adTimerMessage ? (
-              <h3>{adTimerMessage}</h3>
-            ) : (
-              <h3>Watched Today: {adsWatchedToday} / {DAILY_LIMIT}</h3>
-            )}
-            <button onClick={handleWatchAd} disabled={adsWatchedToday >= DAILY_LIMIT || !!adTimerMessage}>
-              ▶️ Watch Ad & Earn Coin
-            </button>
-            <br /><br />
-            <button onClick={handleRedeem}>💸 Redeem Coins</button>
-
-            {showAd && (
-              <div className="ad-container">
-                <iframe
-                  src={currentAdUrl}
-                  title="Ad"
-                  width="320"
-                  height="240"
-                  frameBorder="0"
-                  allow="autoplay"
-                ></iframe>
-              </div>
-            )}
-          </div>
-        </>
-      ) : (
-        <>
-          <p>Please log in to access the app.</p>
-          {/* Login button removed */}
-        </>
-      )}
-    </div>
-  );
+ {user ? (
+ <>
+ <p>Welcome, {user.displayName}</p>
+ <button onClick={handleLogout}>🚪 Logout</button>
+ <div className="main-content">
+ <h2>Coins: {coins}</h2>
+ {adTimerMessage ? (
+ <h3>{adTimerMessage}</h3>
+ ) : (
+ <h3>
+                  Watched Today: {adsWatchedToday} / {DAILY_LIMIT}
+ </h3>
+ )}
+ <button
+ onClick={handleWatchAd}
+ disabled={adsWatchedToday >= DAILY_LIMIT || !!adTimerMessage}
+ >
+                ▶️ Watch Ad & Earn Coin
+ </button>
+ <br />
+ <br />
+ <button onClick={handleRedeem}>💸 Redeem Coins</button>
+ {showAd && (
+ <div className="ad-container">
+ <iframe
+ src={currentAdUrl}
+ title="Ad"
+ width="320"
+ height="240"
+ frameBorder="0"
+ ></iframe>
+ </div>
+ )}
+ </div>
+ </>
+ ) : (
+ <>
+ <p></p>
+ {/* You might want a login button here if you add back authentication */}
+ </>
+ )}
+ </div>
+ );
 }
-
-export default App;
+,App)}
