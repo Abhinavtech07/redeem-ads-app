@@ -23,6 +23,8 @@ function App() {
   const [coins, setCoins] = useState(0);
   const [adsWatchedToday, setAdsWatchedToday] = useState(0);
   const [adTimerMessage, setAdTimerMessage] = useState(''); // Added for timer message
+  const [showAd, setShowAd] = useState(false); // State to control ad iframe visibility
+  const [currentAdUrl, setCurrentAdUrl] = useState(''); // State to store current ad URL
   const DAILY_LIMIT = 200;
   const COINS_PER_AD = 1;
 
@@ -91,6 +93,7 @@ function App() {
 
     if (data.adsWatchedToday >= DAILY_LIMIT) {
       setAdTimerMessage(''); // Clear any previous timer message
+      setShowAd(false); // Ensure ad iframe is hidden
       return alert("You reached your daily limit of ads.");
     }
 
@@ -103,20 +106,14 @@ function App() {
     setAdTimerMessage(`Ad playing... ${timer} seconds remaining`);
 
     // Randomly select an ad link
-    const randomAd = adLinks[Math.floor(Math.random() * adLinks.length)];
-    const adWindow = window.open(randomAd, "_blank", "width=500,height=500");
+    const randomAdUrl = adLinks[Math.floor(Math.random() * adLinks.length)];
+    setCurrentAdUrl(randomAdUrl);
+    setShowAd(true); // Show the ad iframe
 
     const countdown = setInterval(async () => { // Changed to async to use await for updateDoc
       timer--;
-      setAdTimerMessage(`Ad playing... ${timer} seconds remaining`);
 
       if (timer < 0) {
-        clearInterval(countdown);
-
-        if (adWindow) {
-          adWindow.close();
-        }
-
         // Update Firebase and state
         const updatedCoins = (data.coins || 0) + COINS_PER_AD;
         const updatedAds = (data.adsWatchedToday || 0) + 1;
@@ -131,10 +128,15 @@ function App() {
         setCoins(updatedCoins);
         setAdsWatchedToday(updatedAds);
 
+        clearInterval(countdown); // Stop the timer
+
         // Re-enable button and clear timer message
         if (watchAdButton) watchAdButton.disabled = false;
         setAdTimerMessage('');
         alert("✅ 1 Coin Added!");
+
+        setShowAd(false); // Hide the ad iframe
+        setCurrentAdUrl(''); // Clear the ad URL
       }
     }, 1000);
   };
@@ -183,6 +185,15 @@ function App() {
           </button>
           <br /><br />
           <button onClick={handleRedeem}>💸 Redeem Coins</button>
+
+          {/* Ad iframe container */}
+          {showAd && (
+            <div className="ad-container">
+              <iframe src={currentAdUrl} title="Ad" width="320" height="240" frameBorder="0"></iframe>
+              <p>{adTimerMessage}</p> {/* Display timer message within the container */}
+            </div>
+          )}
+
           {/* Add a Reset button here if you implement handleReset */}
           {/* <button onClick={handleReset}>🧹 Reset My Data</button> */}
         </div>
