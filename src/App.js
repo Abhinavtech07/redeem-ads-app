@@ -29,7 +29,6 @@ function App() {
     "https://www.profitableratecpm.com/eszwggg0?key=784e73c7dc4b992d827cc02a85d064b7"
   ];
 
-  useEffect(() => {
   const handleWatchAd = async () => {
     if (!user) return alert("Please log in to watch ads.");
 
@@ -84,7 +83,6 @@ function App() {
     }, 1000);
   };
 
-  // This useEffect seems to be nested inside the previous one. This is likely an error.
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
@@ -96,7 +94,11 @@ function App() {
           setCoins(data.coins || 0);
           setAdsWatchedToday(data.adsWatchedToday || 0);
         } else {
-          await setDoc(userRef, { coins: 0, adsWatchedToday: 0, createdAt: serverTimestamp() });
+          await setDoc(userRef, {
+            coins: 0,
+            adsWatchedToday: 0,
+            createdAt: serverTimestamp()
+          });
         }
       } else {
         setCoins(0);
@@ -104,8 +106,9 @@ function App() {
       }
     });
 
-  // This function seems to be defined within the onAuthStateChanged effect. This is likely an error.
-  }, []); // Added dependency array
+    return () => unsubscribe();
+  }, []);
+
   const handleRedeem = () => {
     if (coins >= 50) {
       alert("🎉 You can redeem ₹10 now! This will be processed manually.");
@@ -120,56 +123,7 @@ function App() {
     } catch (error) {
       console.error("Error logging out:", error);
     }
-  // This function seems to be defined within the handleRedeem function. This is likely an error.
   };
 
-  return (
- <div className="App">
- <header className="App-header">
- <h1></h1>
-      </header>
- {user ? (
- <>
- <p>Welcome, {user.displayName}</p>
- <button onClick={handleLogout}>🚪 Logout</button>
- <div className="main-content">
- <h2>Coins: {coins}</h2>
- {adTimerMessage ? (
- <h3>{adTimerMessage}</h3>
- ) : (
- <h3>
-                  Watched Today: {adsWatchedToday} / {DAILY_LIMIT}
- </h3>
- )}
- <button
- onClick={handleWatchAd}
- disabled={adsWatchedToday >= DAILY_LIMIT || !!adTimerMessage}
- >
-                ▶️ Watch Ad & Earn Coin
- </button>
- <br />
- <br />
- <button onClick={handleRedeem}>💸 Redeem Coins</button>
- {showAd && (
- <div className="ad-container">
- <iframe
- src={currentAdUrl}
- title="Ad"
- width="320"
- height="240"
- frameBorder="0"
- ></iframe>
- </div>
- )}
- </div>
- </>
- ) : (
- <>
- <p></p>
- {/* You might want a login button here if you add back authentication */}
- </>
- )}
- </div>
- );
 }
 export default App;
